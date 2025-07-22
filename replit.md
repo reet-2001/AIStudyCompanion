@@ -102,12 +102,15 @@ Preferred communication style: Simple, everyday language.
 - **File Persistence**: Uploaded PDFs are not saved permanently
 - **Scalability**: Single-instance deployment without load balancing
 
-### Recent Changes (January 22, 2025)
+### Recent Changes (July 22, 2025)
 - **Enhanced AI Service**: Improved text chunking and error handling for Hugging Face API
 - **Robust Question Generation**: Added fallback mechanisms for AI model failures
 - **Better Text Processing**: Enhanced PDF text extraction and cleaning
 - **Error Recovery**: Comprehensive error handling for API rate limits and model issues
 - **MCQ Generation**: Improved multiple choice question creation with content-based options
+- **Interactive Help System**: Added comprehensive modal dialogs for "How it Works", "Features", and "Help" sections
+- **Download Optimization**: Fixed text file download with proper headers and cache-busting for browser compatibility
+- **Local Installation Guide**: Created detailed setup instructions for local development and deployment
 
 ### Migration Path
 The application is architected for easy migration to persistent storage:
