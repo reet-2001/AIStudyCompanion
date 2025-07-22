@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, ListChecks, Download, Eye, Info } from 'lucide-react';
+import { QuestionDisplay } from './QuestionDisplay';
 
 interface ResultsSectionProps {
   results: {
@@ -121,6 +122,7 @@ export function ResultsSection({ results, onDownload }: ResultsSectionProps) {
                           name="sample" 
                           className="mr-3" 
                           checked={option.includes(sampleQuestion.answer)}
+                          readOnly
                         />
                         <span className="text-gray-700">
                           {option} {option.includes(sampleQuestion.answer) ? '✓' : ''}
@@ -145,6 +147,16 @@ export function ResultsSection({ results, onDownload }: ResultsSectionProps) {
         </CardContent>
       </Card>
 
+      {/* Complete Question Display */}
+      <Card className="mb-8 material-card">
+        <CardContent className="p-8">
+          <QuestionDisplay 
+            questionSections={results.questions}
+            totalQuestions={results.totalQuestions}
+          />
+        </CardContent>
+      </Card>
+
       {/* Download Section */}
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-material-3 p-8 text-white text-center">
         <h3 className="text-2xl font-medium mb-4">Your Study Guide is Ready!</h3>
@@ -155,7 +167,7 @@ export function ResultsSection({ results, onDownload }: ResultsSectionProps) {
             className="bg-white text-blue-600 px-8 py-3 font-medium hover:bg-gray-100 flex items-center justify-center"
           >
             <Download className="mr-3 h-4 w-4" />
-            Download PDF Study Guide
+            Download Study Guide
           </Button>
           <Button
             variant="outline"
