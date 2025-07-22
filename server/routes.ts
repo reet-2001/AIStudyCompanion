@@ -110,8 +110,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedTypes: studyGuide.selectedQuestionTypes
       });
 
-      res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Content-Disposition', `attachment; filename="study-guide-${studyGuide.filename}.txt"`);
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="StudyGuide-${studyGuide.filename.replace(/\.[^/.]+$/, "")}.txt"`);
       res.send(pdfBuffer);
 
     } catch (error) {

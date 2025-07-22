@@ -160,7 +160,7 @@ export function ResultsSection({ results, onDownload }: ResultsSectionProps) {
       {/* Download Section */}
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-material-3 p-8 text-white text-center">
         <h3 className="text-2xl font-medium mb-4">Your Study Guide is Ready!</h3>
-        <p className="text-blue-100 mb-6">Download your comprehensive PDF study guide with summary and question bank</p>
+        <p className="text-blue-100 mb-6">Download your comprehensive study guide with summary and question bank</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             onClick={onDownload}
@@ -179,7 +179,7 @@ export function ResultsSection({ results, onDownload }: ResultsSectionProps) {
         </div>
         <div className="mt-4 text-sm text-blue-100 flex items-center justify-center">
           <Info className="w-4 h-4 mr-1" />
-          Generated with {results.totalQuestions} questions • Ready for download
+          Generated with {results.totalQuestions} questions • Text format for easy viewing
         </div>
       </div>
     </div>
