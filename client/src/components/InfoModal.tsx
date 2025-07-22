@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Brain, FileText, Zap, Shield, Clock, CheckCircle, Upload, Settings, Download, HelpCircle, Mail, BookOpen } from 'lucide-react';
 
@@ -270,6 +270,11 @@ export function InfoModal({ trigger, type }: InfoModalProps) {
             {type === 'features' && 'Features'}
             {type === 'help' && 'Help & Support'}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {type === 'how-it-works' && 'Learn how the AI Study Guide Generator works in 4 simple steps'}
+            {type === 'features' && 'Discover all the powerful features available in the AI Study Guide Generator'}
+            {type === 'help' && 'Get help and support for using the AI Study Guide Generator'}
+          </DialogDescription>
         </DialogHeader>
         {renderContent()}
       </DialogContent>
