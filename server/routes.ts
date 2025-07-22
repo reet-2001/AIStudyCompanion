@@ -110,8 +110,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedTypes: studyGuide.selectedQuestionTypes
       });
 
+      // Clear any caching and set proper headers for text download
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="StudyGuide-${studyGuide.filename.replace(/\.[^/.]+$/, "")}.txt"`);
+      res.setHeader('Content-Disposition', `attachment; filename="StudyGuide-${Date.now()}.txt"`);
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
       res.send(pdfBuffer);
 
     } catch (error) {

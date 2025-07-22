@@ -160,14 +160,14 @@ export function ResultsSection({ results, onDownload }: ResultsSectionProps) {
       {/* Download Section */}
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-material-3 p-8 text-white text-center">
         <h3 className="text-2xl font-medium mb-4">Your Study Guide is Ready!</h3>
-        <p className="text-blue-100 mb-6">Download your comprehensive study guide with summary and question bank</p>
+        <p className="text-blue-100 mb-6">Download your comprehensive study guide as a text file - works on any device!</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             onClick={onDownload}
             className="bg-white text-blue-600 px-8 py-3 font-medium hover:bg-gray-100 flex items-center justify-center"
           >
             <Download className="mr-3 h-4 w-4" />
-            Download Study Guide
+            Download Study Guide (.txt)
           </Button>
           <Button
             variant="outline"
