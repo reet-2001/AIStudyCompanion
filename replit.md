@@ -102,6 +102,13 @@ Preferred communication style: Simple, everyday language.
 - **File Persistence**: Uploaded PDFs are not saved permanently
 - **Scalability**: Single-instance deployment without load balancing
 
+### Recent Changes (January 22, 2025)
+- **Enhanced AI Service**: Improved text chunking and error handling for Hugging Face API
+- **Robust Question Generation**: Added fallback mechanisms for AI model failures
+- **Better Text Processing**: Enhanced PDF text extraction and cleaning
+- **Error Recovery**: Comprehensive error handling for API rate limits and model issues
+- **MCQ Generation**: Improved multiple choice question creation with content-based options
+
 ### Migration Path
 The application is architected for easy migration to persistent storage:
 - Drizzle schema is already defined for PostgreSQL
