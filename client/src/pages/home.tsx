@@ -3,6 +3,7 @@ import { FileUpload } from '@/components/FileUpload';
 import { QuestionTypeSelector } from '@/components/QuestionTypeSelector';
 import { ProcessingStatus } from '@/components/ProcessingStatus';
 import { ResultsSection } from '@/components/ResultsSection';
+import { InfoModal } from '@/components/InfoModal';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Brain, FileText, HelpCircle } from 'lucide-react';
@@ -134,9 +135,30 @@ export default function Home() {
               <h1 className="text-xl font-medium text-gray-900">AI Study Guide Generator</h1>
             </div>
             <nav className="hidden md:flex space-x-6">
-              <a href="#" className="text-gray-600 hover:text-primary transition-colors">How it Works</a>
-              <a href="#" className="text-gray-600 hover:text-primary transition-colors">Features</a>
-              <a href="#" className="text-gray-600 hover:text-primary transition-colors">Help</a>
+              <InfoModal 
+                type="how-it-works"
+                trigger={
+                  <button className="text-gray-600 hover:text-primary transition-colors">
+                    How it Works
+                  </button>
+                }
+              />
+              <InfoModal 
+                type="features"
+                trigger={
+                  <button className="text-gray-600 hover:text-primary transition-colors">
+                    Features
+                  </button>
+                }
+              />
+              <InfoModal 
+                type="help"
+                trigger={
+                  <button className="text-gray-600 hover:text-primary transition-colors">
+                    Help
+                  </button>
+                }
+              />
             </nav>
           </div>
         </div>
