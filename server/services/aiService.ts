@@ -55,12 +55,12 @@ export class AIService {
           const expandPrompt = `Based on this summary, provide a detailed academic explanation with key concepts, principles, and important details: ${combinedSummary.substring(0, 500)}`;
           
           const expandedResult = await hf.textGeneration({
-            model: 'google/flan-t5-large',
+            model: 'microsoft/DialoGPT-medium',
             inputs: expandPrompt,
             parameters: {
-              max_new_tokens: 400,
-              temperature: 0.3,
-              do_sample: true,
+              max_new_tokens: 200,
+              temperature: 0.5,
+              do_sample: false,
             }
           });
           
@@ -115,44 +115,14 @@ export class AIService {
       const chunkIndex = i % chunks.length;
       const chunk = chunks[chunkIndex];
       
-      try {
-        const prompt = `Based on this academic content, create a theoretical question that tests conceptual understanding:\n\n${chunk.substring(0, 500)}\n\nQuestion:`;
-        
-        const result = await hf.textGeneration({
-          model: 'google/flan-t5-base',
-          inputs: prompt,
-          parameters: {
-            max_new_tokens: 100,
-            temperature: 0.6,
-            do_sample: true,
-          }
-        });
-        
-        const response = result.generated_text?.trim() || '';
-        let question = response;
-        let answer = `This question relates to the fundamental concepts and theoretical principles discussed in the academic material.`;
-        
-        // Try to create a more specific answer based on the chunk
-        if (chunk.length > 100) {
-          const keyPhrases = chunk.split('.').slice(0, 3).join('. ');
-          answer = `Based on the content: ${keyPhrases}. This demonstrates the key theoretical concepts that students should understand.`;
-        }
-        
-        if (!question || question.length < 10) {
-          question = `Explain the key theoretical concepts and principles discussed in this section of the material.`;
-        }
-        
-        questions.push({
-          question: question.endsWith('?') ? question : question + '?',
-          answer: answer,
-        });
-      } catch (error) {
-        console.log(`Error generating theoretical question ${i}:`, error);
-        questions.push({
-          question: `What are the main theoretical concepts covered in this academic material?`,
-          answer: `The material covers important theoretical frameworks and foundational principles that are essential for understanding the subject matter.`,
-        });
-      }
+      // Generate content-based questions without relying on AI models
+      const question = this.createTheoreticalQuestion(chunk, i + 1);
+      const answer = this.createTheoreticalAnswer(chunk);
+      
+      questions.push({
+        question: question,
+        answer: answer,
+      });
     }
     
     return questions;
@@ -160,25 +130,18 @@ export class AIService {
 
   private async generateApplicationQuestions(text: string, count: number): Promise<any[]> {
     const questions: any[] = [];
-    const chunks = this.splitTextIntoChunks(text, 500);
+    const chunks = this.splitTextIntoChunks(text, 400);
     
-    for (let i = 0; i < count && i < chunks.length; i++) {
-      const chunk = chunks[i];
-      const result = await hf.textGeneration({
-        model: 'google/flan-t5-base',
-        inputs: `Create a practical application question based on this content: ${chunk}`,
-        parameters: {
-          max_new_tokens: 150,
-          temperature: 0.8,
-        }
-      });
+    for (let i = 0; i < count; i++) {
+      const chunkIndex = i % chunks.length;
+      const chunk = chunks[chunkIndex];
       
-      const response = result.generated_text;
-      const [question, answer] = this.parseQuestionAnswer(response);
+      const question = this.createApplicationQuestion(chunk, i + 1);
+      const answer = this.createApplicationAnswer(chunk);
       
       questions.push({
-        question: question || `How can the concepts from this section be applied in real-world scenarios?`,
-        answer: answer || `These concepts can be applied in various practical situations as demonstrated in the text.`,
+        question: question,
+        answer: answer,
       });
     }
     
@@ -187,23 +150,18 @@ export class AIService {
 
   private async generateNumericalQuestions(text: string, count: number): Promise<any[]> {
     const questions: any[] = [];
+    const chunks = this.splitTextIntoChunks(text, 400);
     
     for (let i = 0; i < count; i++) {
-      const result = await hf.textGeneration({
-        model: 'google/flan-t5-base',
-        inputs: `Create a numerical problem based on this content with step-by-step solution: ${text.substring(0, 500)}`,
-        parameters: {
-          max_new_tokens: 200,
-          temperature: 0.6,
-        }
-      });
+      const chunkIndex = i % chunks.length;
+      const chunk = chunks[chunkIndex];
       
-      const response = result.generated_text;
-      const [question, answer] = this.parseQuestionAnswer(response);
+      const question = this.createNumericalQuestion(chunk, i + 1);
+      const answer = this.createNumericalAnswer(chunk);
       
       questions.push({
-        question: question || `Calculate the value based on the formulas and data provided in the text.`,
-        answer: answer || `Step 1: Identify the given values. Step 2: Apply the appropriate formula. Step 3: Calculate the result.`,
+        question: question,
+        answer: answer,
       });
     }
     
@@ -261,27 +219,33 @@ export class AIService {
 
   private async generateTrueFalseQuestions(text: string, count: number): Promise<any[]> {
     const questions: any[] = [];
-    const chunks = this.splitTextIntoChunks(text, 300);
+    const sentences = text.split('.').filter(s => s.trim().length > 20);
     
-    for (let i = 0; i < count && i < chunks.length; i++) {
-      const chunk = chunks[i];
-      const result = await hf.textGeneration({
-        model: 'google/flan-t5-base',
-        inputs: `Create a true or false statement based on this content: ${chunk}`,
-        parameters: {
-          max_new_tokens: 100,
-          temperature: 0.7,
+    for (let i = 0; i < count; i++) {
+      const sentenceIndex = i % sentences.length;
+      const statement = sentences[sentenceIndex]?.trim();
+      
+      if (statement) {
+        const isTrue = Math.random() > 0.3; // Bias toward true statements
+        let questionStatement = statement;
+        
+        if (!isTrue) {
+          // Create a false statement by modifying the original
+          questionStatement = this.createFalseStatement(statement);
         }
-      });
-      
-      const statement = result.generated_text.trim();
-      const isTrue = Math.random() > 0.5;
-      
-      questions.push({
-        question: `True or False: ${statement}`,
-        answer: isTrue ? 'True' : 'False',
-        explanation: `This statement is ${isTrue ? 'true' : 'false'} based on the content provided in the document.`,
-      });
+        
+        questions.push({
+          question: `True or False: ${questionStatement}`,
+          answer: isTrue ? 'True' : 'False',
+          explanation: `This statement is ${isTrue ? 'true' : 'false'} based on the content provided in the document.`,
+        });
+      } else {
+        questions.push({
+          question: `True or False: The document discusses important academic concepts.`,
+          answer: 'True',
+          explanation: `This statement is true as the document contains academic material relevant to the subject.`,
+        });
+      }
     }
     
     return questions;
@@ -387,6 +351,98 @@ export class AIService {
       answer: correctAnswer,
       explanation: `Option ${correctAnswer} is correct based on the information provided in the document.`,
     };
+  }
+
+  private createTheoreticalQuestion(chunk: string, questionNumber: number): string {
+    const concepts = chunk.split('.').filter(s => s.trim().length > 10);
+    const mainConcept = concepts[0]?.trim() || 'the key concepts';
+    
+    const questionTemplates = [
+      `What are the fundamental principles underlying ${mainConcept.toLowerCase()}?`,
+      `Explain the theoretical framework related to the concepts discussed in this section.`,
+      `What are the key theoretical aspects that define the main ideas presented?`,
+      `Describe the conceptual foundation of the topics covered in this material.`,
+      `What theoretical concepts are essential for understanding this subject matter?`
+    ];
+    
+    return questionTemplates[questionNumber % questionTemplates.length];
+  }
+
+  private createTheoreticalAnswer(chunk: string): string {
+    const sentences = chunk.split('.').filter(s => s.trim().length > 10);
+    const keyPoints = sentences.slice(0, 3).join('. ').trim();
+    
+    return `The theoretical concepts include: ${keyPoints}. These principles form the foundational understanding necessary for mastering the subject matter and provide the conceptual framework for further study.`;
+  }
+
+  private createApplicationQuestion(chunk: string, questionNumber: number): string {
+    const questionTemplates = [
+      `How can the concepts from this section be applied in real-world scenarios?`,
+      `What practical applications emerge from the principles discussed in this material?`,
+      `In what ways can these concepts be implemented in professional practice?`,
+      `How would you apply these theoretical principles to solve practical problems?`,
+      `What are the real-world implications of the concepts presented in this section?`
+    ];
+    
+    return questionTemplates[questionNumber % questionTemplates.length];
+  }
+
+  private createApplicationAnswer(chunk: string): string {
+    const keyContent = chunk.split('.').slice(0, 2).join('. ').trim();
+    
+    return `These concepts can be applied in practical scenarios by: implementing the principles outlined in the material, applying the methodologies to real-world situations, and utilizing the frameworks for problem-solving. Specifically, ${keyContent} demonstrates practical applications that can be adapted to various professional contexts.`;
+  }
+
+  private createNumericalQuestion(chunk: string, questionNumber: number): string {
+    const hasNumbers = /\d/.test(chunk);
+    
+    if (hasNumbers) {
+      return `Calculate the relevant values using the formulas and data provided in this section.`;
+    }
+    
+    const questionTemplates = [
+      `If numerical data were provided, how would you calculate the key parameters discussed?`,
+      `What mathematical relationships can be derived from the concepts in this section?`,
+      `How would you quantify the variables mentioned in this material?`,
+      `What calculations would be necessary to analyze the data related to these concepts?`,
+      `What numerical methods would apply to the problems discussed in this section?`
+    ];
+    
+    return questionTemplates[questionNumber % questionTemplates.length];
+  }
+
+  private createNumericalAnswer(chunk: string): string {
+    const hasNumbers = /\d/.test(chunk);
+    
+    if (hasNumbers) {
+      return `Step 1: Identify the given values and parameters from the text. Step 2: Apply the appropriate formulas or equations mentioned. Step 3: Perform the calculations systematically. Step 4: Verify the results and check units for consistency.`;
+    }
+    
+    return `For numerical problems related to this content: Step 1: Identify relevant variables and parameters. Step 2: Determine appropriate mathematical relationships. Step 3: Apply standard formulas for the field. Step 4: Calculate results and interpret findings in context.`;
+  }
+
+  private createFalseStatement(originalStatement: string): string {
+    // Simple modifications to create false statements
+    const modifications = [
+      (s: string) => s.replace(/is /g, 'is not '),
+      (s: string) => s.replace(/are /g, 'are not '),
+      (s: string) => s.replace(/can /g, 'cannot '),
+      (s: string) => s.replace(/will /g, 'will not '),
+      (s: string) => s.replace(/increases/g, 'decreases'),
+      (s: string) => s.replace(/decreases/g, 'increases'),
+      (s: string) => s.replace(/high/g, 'low'),
+      (s: string) => s.replace(/low/g, 'high'),
+    ];
+    
+    const randomModification = modifications[Math.floor(Math.random() * modifications.length)];
+    const modifiedStatement = randomModification(originalStatement);
+    
+    // If no modification was made, add a negation
+    if (modifiedStatement === originalStatement) {
+      return `It is not true that ${originalStatement.toLowerCase()}`;
+    }
+    
+    return modifiedStatement;
   }
 }
 
